@@ -1,0 +1,28 @@
+﻿@page "/"
+
+<h1>Welcome to Blazor!</h1>
+
+<Grid Data=@data Context="gridContext">
+    <Columns Context="rowData">
+        <GridColumn Data="@rowData?.ID"><img src="@rowData?.Avatar" width="64" height="64"/></GridColumn>
+        <GridColumn Title="Name" Data="@rowData?.Handle"/>
+        <GridColumn Data="@rowData?.UsesBlazor">@(rowData?.UsesBlazor ?? false ? "Yay!" : "Boo!")</GridColumn>
+    </Columns>
+</Grid>
+
+@code {
+    List<Person> data = new List<Person>();
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        data.Add(new Person { ID = 1, UsesBlazor = true, Handle = "MisterMagoo", Avatar = new Uri("https://avatars-03.gitter.im/gh/uv/4/SQL-MisterMagoo?s=64") });
+        data.Add(new Person { ID = 2, UsesBlazor = true, Handle = "MrPMorris", Avatar = new Uri("https://avatars-02.gitter.im/gh/uv/4/mrpmorris?s=64") });
+    }
+    class Person
+    {
+        public int ID { get; set; }
+        public bool UsesBlazor { get; set; }
+        public string Handle { get; set; }
+        public Uri Avatar { get; set; }
+    }
+}

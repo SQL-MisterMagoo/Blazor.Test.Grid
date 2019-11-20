@@ -1,0 +1,19 @@
+﻿@implements IGrid
+@typeparam T
+<table style="border:solid 1px gray;">
+    <CascadingValue Value=@(this) Name="Grid">
+        @{ 
+            GridRowType = GridRowTypes.Header;
+            <tr>@Columns(default(T))</tr>
+            foreach (T item in Data)
+            {
+                <tr>@Columns(item)</tr>
+            }
+        }
+    </CascadingValue>
+</table>
+@code {
+    [Parameter] public IEnumerable<T> Data { get; set; }
+    [Parameter] public RenderFragment<T> Columns { get; set; }
+    public GridRowTypes GridRowType { get; private set; } = GridRowTypes.Header;
+}

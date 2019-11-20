@@ -1,0 +1,22 @@
+﻿@typeparam T
+@if (!(Data is T))
+{
+    <th style="border:solid 2px gray;background-color:gray;color:white;">@(Title)</th>
+}
+else
+{
+    @if (ChildContent is object)
+    {
+        <td style="border:solid 1px gray;">@ChildContent(Data)</td>
+    }
+    else
+    {
+        <td style="border:solid 1px gray;">@Data</td>
+    }
+}
+@code {
+    [CascadingParameter(Name = "Grid")] public IGrid ParentGrid { get; set; }
+    [Parameter] public T Data { get; set; }
+    [Parameter] public string Title { get; set; }
+    [Parameter] public RenderFragment<T> ChildContent { get; set; }
+}
