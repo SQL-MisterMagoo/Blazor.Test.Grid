@@ -1,29 +1,23 @@
+# Blazor Test Grid
 
-# Blazor Twins
+Sample generic components based on a grid.
 
-This is a template Solution for building Blazor with two front ends - Client side and Server side, which you can switch between at will.
+Grid.razor - the top level Grid component
+GridColumn.razor - A column definition component
 
-Changelog:
+## Sample
 
-#### Version 0.1.0-beta-1
-- Initial commit contains a 3 project solution 
+``` HTML
+<Grid Data=@data Context="gridContext">
+    <Columns Context="rowData">
+        <GridColumn Data="@rowData?.ID"><img src="@rowData?.Avatar" width="64" height="64"/></GridColumn>
+        <GridColumn Title="Name" Data="@rowData?.Handle"/>
+        <GridColumn Data="@rowData?.UsesBlazor">@(rowData?.UsesBlazor ?? false ? "Yay!" : "Boo!")</GridColumn>
+    </Columns>
+</Grid>
+```
+This sample shows the use of strongly type data in child components and how to access row-level data inside a templated component.
 
-Projects in this repo:
+## Known Issues
 
-## Blazor.Test.Grid.Core
-
-This is the library that provides all the pages and components for the demo.
-Everything interesting is in this library.
-
-## Blazor.Test.Grid.Client
-
-A Blazor/WASM front end for the demo - this is a shell only.
-
-Useful for testing everything works in WASM mode.
-
-## Blazor.Test.Grid.Server
-
-A Blazor Server side front end for the demo - this is a shell only.
-
-Useful for debugging and making sure everything works server side.
-
+This is a quick sample - it is incomplete - not a re-usable grid component. For research only.
