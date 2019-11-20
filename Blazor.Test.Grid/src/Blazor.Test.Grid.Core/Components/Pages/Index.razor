@@ -4,19 +4,28 @@
 
 <Grid Data=@data Context="gridContext">
     <Columns Context="rowData">
+        <!-- Simple data column showing use of other properties from the row -->
         <GridColumn Data="@rowData?.ID"><img src="@rowData?.Avatar" width="64" height="64"/></GridColumn>
+        <!-- Bound simple data -->
         <GridColumn Title="Name" Data="@rowData?.Handle"/>
+        <!-- Expression Field using intellisense to modify the template -->
+        <GridColumn Title="Name2" Field="@(() => rowData?.Handle)" Context="Column3">!! @Column3.Replace("M","*")</GridColumn>
+        <!-- Expression Field using Intellisense on child property with different type -->
+        <GridColumn Title="Age of Friend" Field="@(() => rowData?.Friend)" Context="Col5">The friend is @(Col5.Age)</GridColumn>
+        <!-- Another data column using row data in the template -->
         <GridColumn Data="@rowData?.UsesBlazor">@(rowData?.UsesBlazor ?? false ? "Yay!" : "Boo!")</GridColumn>
+
     </Columns>
 </Grid>
 
 @code {
-    List<Person> data = new List<Person>();
+        List<Person> data = new List<Person>();
     protected override void OnInitialized()
     {
         base.OnInitialized();
         data.Add(new Person { ID = 1, UsesBlazor = true, Handle = "MisterMagoo", Avatar = new Uri("https://avatars-03.gitter.im/gh/uv/4/SQL-MisterMagoo?s=64") });
-        data.Add(new Person { ID = 2, UsesBlazor = true, Handle = "MrPMorris", Avatar = new Uri("https://avatars-02.gitter.im/gh/uv/4/mrpmorris?s=64") });
+        data.Add(new Person { ID = 2, Friend = new PersonWithAge { BirthDate = DateTime.Today.AddYears(-43) }, UsesBlazor = true, Handle = "MrPMorris", Avatar = new Uri("https://avatars-02.gitter.im/gh/uv/4/mrpmorris?s=64") });
+        data.First().Friend = new PersonWithAge { BirthDate = DateTime.Today.AddDays(-15357) };
     }
     class Person
     {
@@ -24,5 +33,11 @@
         public bool UsesBlazor { get; set; }
         public string Handle { get; set; }
         public Uri Avatar { get; set; }
+        public PersonWithAge Friend { get; set; }
+    }
+    class PersonWithAge : Person
+    {
+        public DateTime BirthDate { get; set; }
+        public int Age { get => BirthDate.Date > DateTime.Today.AddYears(BirthDate.Year - DateTime.Today.Year) ? DateTime.Today.Year - BirthDate.Year - 1 : DateTime.Today.Year - BirthDate.Year ; }
     }
 }
