@@ -1,25 +1,28 @@
 ﻿@page "/"
-
+@using Blazor.Test.Grid.Core
 <h1>Welcome to Blazor!</h1>
 
+@if (data is object)
+{
 <Grid Data=@data Context="gridContext">
-    <Columns Context="rowData">
-        <!-- Simple data column showing use of other properties from the row -->
-        <GridColumn Data="@rowData?.ID"><img src="@rowData?.Avatar" width="64" height="64"/></GridColumn>
-        <!-- Bound simple data -->
-        <GridColumn Title="Name" Data="@rowData?.Handle"/>
-        <!-- Expression Field using intellisense to modify the template -->
-        <GridColumn Title="Name2" Field="@(() => rowData?.Handle)" Context="Column3">!! @Column3.Replace("M","*")</GridColumn>
-        <!-- Expression Field using Intellisense on child property with different type -->
-        <GridColumn Title="Age of Friend" Field="@(() => rowData?.Friend)" Context="Col5">The friend is @(Col5.Age)</GridColumn>
-        <!-- Another data column using row data in the template -->
-        <GridColumn Data="@rowData?.UsesBlazor">@(rowData?.UsesBlazor ?? false ? "Yay!" : "Boo!")</GridColumn>
-
+    <RowTemplate Context="rowData">
+        <tr>@rowData</tr>
+    </RowTemplate>
+    <Columns Context="Column">
+        <GridColumn Data="@Column.Item.ID"><img src="@Column.Item.Avatar" width="64" height="64" /></GridColumn>
+        <GridColumn Title="Name" Data="@Column.Item.Handle" /> 
+        <GridColumn Title="Age of Friend" Field="@(() => Column.Item.Friend)" Context="Col5">The friend is @(Col5.Age)</GridColumn>
     </Columns>
 </Grid>
+        @*<Columns Context="rowData">
+            <GridColumn Data="@rowData?.ID"><img src="@rowData?.Avatar" width="64" height="64" /></GridColumn>
+            <GridColumn Data="@rowData?.UsesBlazor">@(rowData?.UsesBlazor ?? false ? "Yay!" : "Boo!")</GridColumn>
+        </Columns>*@
+}
+<button @onclick=StateHasChanged>click me</button>
 
 @code {
-        List<Person> data = new List<Person>();
+    List<Person> data = new List<Person>();
     protected override void OnInitialized()
     {
         base.OnInitialized();
@@ -38,6 +41,30 @@
     class PersonWithAge : Person
     {
         public DateTime BirthDate { get; set; }
-        public int Age { get => BirthDate.Date > DateTime.Today.AddYears(BirthDate.Year - DateTime.Today.Year) ? DateTime.Today.Year - BirthDate.Year - 1 : DateTime.Today.Year - BirthDate.Year ; }
+        public int Age { get => BirthDate.Date > DateTime.Today.AddYears(BirthDate.Year - DateTime.Today.Year) ? DateTime.Today.Year - BirthDate.Year - 1 : DateTime.Today.Year - BirthDate.Year; }
     }
+    RenderFragment<string> test = (code) =>
+    {
+        return (RenderFragment)(b =>
+        {
+            b.OpenElement(1, "script");
+            b.AddAttribute(2, "id", "myscript");
+            b.AddMarkupContent(3, code);
+            b.CloseElement();
+        });
+    };
+    RenderFragment<string> InlineStyle = (code) =>
+    {
+        return (RenderFragment)(b =>
+        {
+            b.OpenComponent<Blazor.Test.Grid.Core.Components.Tag>(1);
+            b.AddAttribute(2, "Name", "style");
+            b.AddAttribute(3, "ChildContent", (Microsoft.AspNetCore.Components.RenderFragment)((b2) =>
+            {
+                b2.AddContent(4, code);
+            }
+            ));
+            b.CloseComponent();
+        });
+    };
 }

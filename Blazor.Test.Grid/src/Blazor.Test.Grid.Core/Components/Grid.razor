@@ -1,19 +1,22 @@
-﻿@implements IGrid
-@typeparam T
+﻿@typeparam T
 <table style="border:solid 1px gray;">
-    <CascadingValue Value=@(this) Name="Grid">
-        @{ 
-            GridRowType = GridRowTypes.Header;
-            <tr>@Columns(default(T))</tr>
-            foreach (T item in Data)
+    @*<CascadingValue Value=@(this) Name="Grid">*@
+        @RowTemplate(Columns(("Header", default(T))))
+        @if (Data is null)
+        {
+            <div>Loading...</div>
+        }
+        else
+        {
+            @foreach (T item in Data)
             {
-                <tr>@Columns(item)</tr>
+                @: @RowTemplate(Columns(("Data", item)));
             }
         }
-    </CascadingValue>
+    @*</CascadingValue>*@
 </table>
 @code {
     [Parameter] public IEnumerable<T> Data { get; set; }
-    [Parameter] public RenderFragment<T> Columns { get; set; }
-    public GridRowTypes GridRowType { get; private set; } = GridRowTypes.Header;
+    [Parameter] public RenderFragment<(string rowType, T Item)> Columns { get; set; }
+    [Parameter] public RenderFragment<RenderFragment> RowTemplate { get; set; }
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Blazor.Test.Grid.Core.Components
+namespace Blazor.Test.Grid.Core
 {
     public enum GridRowTypes
     {
