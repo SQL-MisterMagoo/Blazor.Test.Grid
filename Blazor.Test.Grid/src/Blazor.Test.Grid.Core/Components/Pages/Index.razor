@@ -4,67 +4,22 @@
 
 @if (data is object)
 {
-<Grid Data=@data Context="gridContext">
-    <RowTemplate Context="rowData">
-        <tr>@rowData</tr>
-    </RowTemplate>
-    <Columns Context="Column">
-        <GridColumn Data="@Column.Item.ID"><img src="@Column.Item.Avatar" width="64" height="64" /></GridColumn>
-        <GridColumn Title="Name" Data="@Column.Item.Handle" /> 
-        <GridColumn Title="Age of Friend" Field="@(() => Column.Item.Friend)" Context="Col5">The friend is @(Col5.Age)</GridColumn>
-    </Columns>
-</Grid>
-        @*<Columns Context="rowData">
-            <GridColumn Data="@rowData?.ID"><img src="@rowData?.Avatar" width="64" height="64" /></GridColumn>
-            <GridColumn Data="@rowData?.UsesBlazor">@(rowData?.UsesBlazor ?? false ? "Yay!" : "Boo!")</GridColumn>
-        </Columns>*@
+	<Grid Data=@data Context="gridContext" Grouping=@((WeatherForecast data)=>data.Summary)>
+		<Columns Context="Column">
+			<GridColumn Class=@((Column.rowType == Grid<WeatherForecast>.RowType.Header ? "p-2 bg-secondary text-light" : "p-2 bg-light text-dark")) Title="Last Rendered" Data="@Column.Item?.LastRendered" />
+			<GridColumn Class=@((Column.rowType == Grid<WeatherForecast>.RowType.Header ? "p-2 bg-secondary text-light" : "p-2 bg-light text-dark")) Title="Date" Data="@Column.Item?.Date" />
+			<GridColumn Class=@((Column.rowType == Grid<WeatherForecast>.RowType.Header ? "p-2 bg-secondary text-light" : "p-2 bg-light text-dark")) Title="Temp C" Data="@Column.Item?.TemperatureC" />
+			<GridColumn Class=@((Column.rowType == Grid<WeatherForecast>.RowType.Header ? "p-2 bg-secondary text-light" : "p-2 bg-light text-dark")) Title="Temp F" Data="@Column.Item?.TemperatureF" />
+		</Columns>
+	</Grid>
 }
 <button @onclick=StateHasChanged>click me</button>
 
 @code {
-    List<Person> data = new List<Person>();
-    protected override void OnInitialized()
-    {
-        base.OnInitialized();
-        data.Add(new Person { ID = 1, UsesBlazor = true, Handle = "MisterMagoo", Avatar = new Uri("https://avatars-03.gitter.im/gh/uv/4/SQL-MisterMagoo?s=64") });
-        data.Add(new Person { ID = 2, Friend = new PersonWithAge { BirthDate = DateTime.Today.AddYears(-43) }, UsesBlazor = true, Handle = "MrPMorris", Avatar = new Uri("https://avatars-02.gitter.im/gh/uv/4/mrpmorris?s=64") });
-        data.First().Friend = new PersonWithAge { BirthDate = DateTime.Today.AddDays(-15357) };
-    }
-    class Person
-    {
-        public int ID { get; set; }
-        public bool UsesBlazor { get; set; }
-        public string Handle { get; set; }
-        public Uri Avatar { get; set; }
-        public PersonWithAge Friend { get; set; }
-    }
-    class PersonWithAge : Person
-    {
-        public DateTime BirthDate { get; set; }
-        public int Age { get => BirthDate.Date > DateTime.Today.AddYears(BirthDate.Year - DateTime.Today.Year) ? DateTime.Today.Year - BirthDate.Year - 1 : DateTime.Today.Year - BirthDate.Year; }
-    }
-    RenderFragment<string> test = (code) =>
-    {
-        return (RenderFragment)(b =>
-        {
-            b.OpenElement(1, "script");
-            b.AddAttribute(2, "id", "myscript");
-            b.AddMarkupContent(3, code);
-            b.CloseElement();
-        });
-    };
-    RenderFragment<string> InlineStyle = (code) =>
-    {
-        return (RenderFragment)(b =>
-        {
-            b.OpenComponent<Blazor.Test.Grid.Core.Components.Tag>(1);
-            b.AddAttribute(2, "Name", "style");
-            b.AddAttribute(3, "ChildContent", (Microsoft.AspNetCore.Components.RenderFragment)((b2) =>
-            {
-                b2.AddContent(4, code);
-            }
-            ));
-            b.CloseComponent();
-        });
-    };
+	WeatherForecast[] data;
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+		data = WeatherForecast.Data;
+	}
 }

@@ -1,22 +1,65 @@
 ﻿@typeparam T
-<table style="border:solid 1px gray;">
-    @*<CascadingValue Value=@(this) Name="Grid">*@
-        @RowTemplate(Columns(("Header", default(T))))
-        @if (Data is null)
-        {
-            <div>Loading...</div>
-        }
-        else
-        {
-            @foreach (T item in Data)
-            {
-                @: @RowTemplate(Columns(("Data", item)));
-            }
-        }
-    @*</CascadingValue>*@
+@using System.Collections.Generic
+<table class="bg-secondary text-light border-1 w-100">
+	<thead>
+		<tr>@RowTemplate(Columns((RowType.Header, default(T))))</tr>
+	</thead>
+	@if (Data is null)
+	{
+		<div>Loading...</div>
+	}
+	else
+	{
+		<tbody>
+			@if (Grouping is null)
+			{
+				foreach (var item in Data)
+				{
+					<tr @key=item>@RowTemplate(Columns((RowType.Detail, item)))</tr>
+				}
+			}
+			else
+			{
+				@foreach (var items in Data.GroupBy(Grouping))
+				{
+					<tr style="cursor:pointer" @key=items.Key @onclick=@(()=>ToggleGroup(items.Key))>@GroupTemplate(items)</tr>
+					foreach (var item in items)
+					{
+						<tr @key=item style="display: @((Collapsed.Contains(items.Key) ? "none" : "table-row"))">@RowTemplate(Columns((RowType.Detail, item)))</tr>
+					}
+				}
+			}
+		</tbody>
+	}
 </table>
 @code {
-    [Parameter] public IEnumerable<T> Data { get; set; }
-    [Parameter] public RenderFragment<(string rowType, T Item)> Columns { get; set; }
-    [Parameter] public RenderFragment<RenderFragment> RowTemplate { get; set; }
+	[Parameter] public IEnumerable<T> Data { get; set; }
+	[Parameter] public Func<T, object> Grouping { get; set; } = null;
+	[Parameter] public RenderFragment<(RowType rowType, T Item)> Columns { get; set; }
+	[Parameter]
+	public RenderFragment<IGrouping<object, T>> GroupTemplate { get; set; } = groupData =>@<GridColumn Data="@groupData.Key" Class="p-2 bg-secondary text-light" />;
+	[Parameter]
+	public RenderFragment<RenderFragment> RowTemplate { get; set; } = fragment =>@<text>@fragment</text>;
+	public enum RowType { Header, Detail, Footer }
+	private HashSet<object> Collapsed = new HashSet<object>();
+	private long start;
+
+	void ToggleGroup(object Key)
+	{
+		if (Collapsed.Contains(Key))
+		{
+			Collapsed.Remove(Key);
+		}
+		else
+		{
+			Collapsed.Add(Key);
+		}
+	}
+
+	protected override bool ShouldRender()
+	{
+		start = System.Diagnostics.Stopwatch.GetTimestamp();
+		return true;
+	}
 }
+Last render : @TimeSpan.FromTicks(System.Diagnostics.Stopwatch.GetTimestamp() - start)

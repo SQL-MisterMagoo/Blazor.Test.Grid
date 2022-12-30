@@ -1,37 +1,41 @@
-﻿@typeparam T 
+﻿@typeparam T
 @if (!(Data is T))
 {
-    <th style="border:solid 2px gray;background-color:gray;color:white;">@(Title)</th>
+	<th class=@(ClassHeader ?? Class) style="overflow:hidden;resize:horizontal;border:solid 2px gray;background-color:gray;color:white;">@(Title)</th>
 }
 else
 {
-    @if (ChildContent is object)
-    {
-        <td style="border:solid 1px gray;">@ChildContent(Data)</td>
-    }
-    else
-    {
-        <td style="border:solid 1px gray;">@Data</td>
-    }
+	@if (ChildContent is object)
+	{
+		<td class=@Class style="overflow:hidden;resize:both;border:solid 1px gray;">@ChildContent(Data)</td>
+	}
+	else
+	{
+		<td class=@Class style="overflow:hidden;resize:both;border:solid 1px gray;">@Data</td>
+	}
 }
 @code {
-    T _Data;
-    [CascadingParameter(Name = "Grid")] public IGrid ParentGrid { get; set; }
-    [Parameter] public T Data
-    {
-        get
-        {
-            if (_Data is object) return _Data;
-            try
-            {
-                return Field.Invoke();
-            }
-            catch { }
-            return default;
-        }
-        set => _Data = value; 
-    }
-    [Parameter] public Func<T> Field { get; set; }
-    [Parameter] public string Title { get; set; }
-    [Parameter] public RenderFragment<T> ChildContent { get; set; }
+	T _Data;
+	[Parameter]
+	public T Data
+	{
+		get
+		{
+			if (_Data is object) return _Data;
+			if (Field is Func<T> func)
+				try
+				{
+					return func.Invoke();
+				}
+				catch { }
+			return default;
+		}
+		set => _Data = value;
+	}
+	[Parameter] public Func<T> Field { get; set; }
+	[Parameter] public string Title { get; set; }
+	[Parameter] public RenderFragment<T> ChildContent { get; set; }
+	[Parameter] public string Class { get; set; }
+	[Parameter] public string ClassHeader { get; set; }
+	
 }

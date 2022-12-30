@@ -1,4 +1,5 @@
 ﻿@inherits LayoutComponentBase
+@inject TimingService timingService
 
 <div class="sidebar">
     <NavMenu />
@@ -6,6 +7,8 @@
 
 <div class="main">
     <div class="top-row px-4">
+        <button @onclick=timingService.DumpTimingSummary>Summary</button>
+        <button @onclick=timingService.ClearHistory>Reset</button>
         <a href="https://docs.microsoft.com/en-us/aspnet/" target="_blank" class="ml-md-auto">About</a>
     </div>
 
@@ -13,3 +16,4 @@
         @Body
     </div>
 </div>
+
